@@ -1,0 +1,9 @@
+langchain==0.0.341
+pydantic==1.10.12
+python-dotenv==1.0.0
+chromadb==0.4.5
+python-docx==0.8.11
+pypdf==3.16.2
+colorama==0.4.6
+tiktoken==0.5.1
+openpyxl==3.1.2
