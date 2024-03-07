@@ -1,0 +1,10 @@
+{
+    "_type": "prompt",
+    "input_variables": [
+      "table_name",
+      "inspections",
+      "query",
+      "spatial_ref"
+    ],
+    "template_path": "database_analyser.txt"
+}

@@ -1,6 +1,6 @@
 from typing import List, Optional, Tuple
 
-from langchain.chat_models.base import BaseChatModel
+# from langchain.chat_models.base import BaseChatModel
 from langchain.llms import BaseLLM
 from langchain.memory import ConversationTokenBufferMemory, VectorStoreRetrieverMemory
 from langchain.output_parsers import PydanticOutputParser, OutputFixingParser
@@ -12,6 +12,8 @@ from pydantic import ValidationError
 from MapAgent.Action import Action
 from Utils.PromptTemplateBuilder import PromptTemplateBuilder
 from Utils.PrintUtils import *
+import asyncio
+from langchain.callbacks import AsyncIteratorCallbackHandler
 
 class MapGPT:
     """MapGPT：基于Langchain实现"""
@@ -21,18 +23,19 @@ class MapGPT:
             llm: BaseLLM,
             prompts_path: str,
             tools: List[BaseTool],
-            work_dir: str = "./data",
+            # work_dir: str = "./data",
             main_prompt_file: str = "main.json",
             final_prompt_file: str = "final_step.json",
             agent_name: Optional[str] = "瓜瓜",
             agent_role: Optional[str] = "强大的AI助手，可以使用工具与指令自动化解决问题",
             max_thought_steps: Optional[int] = 10,
             memery_retriever: Optional[VectorStoreRetriever] = None,
+            callback:Optional[AsyncIteratorCallbackHandler] = None
     ):
         self.llm = llm
         self.prompts_path = prompts_path
         self.tools = tools
-        self.work_dir = work_dir
+        # self.work_dir = work_dir
         self.agent_name = agent_name
         self.agent_role = agent_role
         self.max_thought_steps = max_thought_steps
@@ -44,6 +47,7 @@ class MapGPT:
 
         self.main_prompt_file = main_prompt_file
         self.final_prompt_file = final_prompt_file
+        self.callback = callback
 
     def _find_tool(self, tool_name: str) -> Optional[BaseTool]:
         for tool in self.tools:
@@ -123,7 +127,7 @@ class MapGPT:
         plan = response[plan_start:]
         return plan
 
-    def run(self, task_description, verbose=False) -> str:
+    async def run(self, task_description, verbose=False) -> str:
         thought_step_count = 0 # 思考步数
 
         # 初始化模板
@@ -134,7 +138,7 @@ class MapGPT:
             tools=self.tools,
             output_parser=self.output_parser,
         ).partial(
-            work_dir=self.work_dir,
+            # work_dir=self.work_dir,
             ai_name=self.agent_name,
             ai_role=self.agent_role,
             task_description=task_description,
@@ -164,18 +168,62 @@ class MapGPT:
             long_term_memory = None
 
         reply = ""
+        response = ""
 
         while thought_step_count < self.max_thought_steps:
             if verbose:
                 color_print(f">>>>Round: {thought_step_count}<<<<",ROUND_COLOR)
 
-            action, response = self._step(
-                chain,
-                task_description=task_description,
-                short_term_memory=short_term_memory,
-                long_term_memory=long_term_memory,
-                verbose=verbose,
-            )
+            # action, response = self._step(
+            #     chain,
+            #     task_description=task_description,
+            #     short_term_memory=short_term_memory,
+            #     long_term_memory=long_term_memory,
+            #     verbose=verbose,
+            # )
+            # response = ""
+            # task = asyncio.create_task(
+            #     chain.ainvoke({
+            #         "short_term_memory": short_term_memory.load_memory_variables({})["history"],
+            #         "long_term_memory" : long_term_memory.load_memory_variables(
+            #             {"prompt": task_description}
+            #         )["history"] if long_term_memory is not None else "",
+            #     })
+            # )
+            # try:
+            #     async for token in self.callback.aiter():
+            #         yield token
+            #         print('token',token)
+            #         if verbose:
+            #             color_print(token, THOUGHT_COLOR, end="")
+            #         response += token
+            # except Exception as e:
+            #     print(f" Caught exception:{e}")
+            # # finally:
+            #     # print()
+            #     # self.callback.done.set()
+            # await task
+            # print('response',response)
+            
+            
+            
+            
+            
+            async for s in chain.astream({
+                "short_term_memory": short_term_memory.load_memory_variables({})["history"],
+                "long_term_memory" : long_term_memory.load_memory_variables(
+                    {"prompt": task_description}
+                )["history"] if long_term_memory is not None else "",
+            }):
+                response += s
+                response_text = response.replace("\n", "\\n")
+                yield f'data: {response_text}\n\n'
+                if verbose:
+                    color_print(s, THOUGHT_COLOR, end="")
+                # response += s
+
+            action = self.robust_parser.parse(response)
+        # return (action, response)
 
             if action.name == "FINISH":
                 if verbose:
@@ -207,5 +255,5 @@ class MapGPT:
                 {"output": reply}
             )
 
-        return reply
+        # return reply
 

@@ -5,8 +5,6 @@
 你的任务是:
 {task_description}
 
-你需要的所有文件资料都在以下目录:
-dir_path={work_dir}
 
 你必须遵循以下约束:
 {constraints}

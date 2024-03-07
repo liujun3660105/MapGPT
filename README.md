@@ -37,3 +37,7 @@ pip install -r requirements.txt
 * 给这两家供应商发一封邮件通知此事
 * 对比8月和9月销售情况，写一份报告
 
+
+```sql
+    select * from road_centerline where id = 1
+```

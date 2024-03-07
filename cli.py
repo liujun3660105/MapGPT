@@ -9,6 +9,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from Tools import *
 from Tools.PythonTool import ExcelAnalyser
+from Tools.SqlTool import SqlAnalyser
 from langchain.agents.agent_toolkits import FileManagementToolkit
 
 
@@ -45,6 +46,8 @@ def main():
         document_generation_tool,
         email_tool,
         excel_inspection_tool,
+        database_table_choose_tool,
+        database_inspection_tool
     ]
 
     # 添加文件管理工具
@@ -56,14 +59,14 @@ def main():
     tools += [ExcelAnalyser(
         prompts_path="./prompts/tools",
         prompt_file="excel_analyser.json"
-    ).as_tool()]
+    ).as_tool(),SqlAnalyser(prompts_path='./prompts/tools',prompt_file="database_analyser.json").as_tool()]
 
     # 定义智能体
     agent = MapGPT(
         llm=llm,
         prompts_path="./prompts/main",
         tools=tools,
-        work_dir="./data",
+        # work_dir="./data",
         main_prompt_file="main.json",
         final_prompt_file="final_step.json",
         max_thought_steps=20,

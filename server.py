@@ -1,3 +1,6 @@
+# 加载环境变量
+from dotenv import load_dotenv, find_dotenv
+_ = load_dotenv(find_dotenv())
 from config.config import Config,WebServerParameters
 import argparse
 import os
@@ -9,6 +12,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from Utils.logUtils import logging_str_to_uvicorn_level,setup_logging,_get_logging_level
+from MapAgent.InitAgent import start_agent
+from MapAgent.MapGPT import MapGPT
+from router import chat
+from router import docs_agent
 
 CFG = Config()
 
@@ -32,7 +39,10 @@ app.add_middleware(
 
 
 def mount_routers(app: FastAPI):
-    """Lazy import to avoid high time cost"""
+    """Lazy import to avoid high time cost""" 
+    app.include_router(chat.router, prefix="/api/v1", tags=["chat"])
+    app.include_router(docs_agent.router, prefix="/api/v1", tags=["chat"])
+    
     # from dbgpt.app.knowledge.api import router as knowledge_router
     # from dbgpt.app.llm_manage.api import router as llm_manage_api
     # from dbgpt.app.openapi.api_v1.api_v1 import router as api_v1
@@ -64,8 +74,8 @@ def _get_webserver_params(args: List[str] = None):
     parser: argparse.ArgumentParser = EnvArgumentParser.create_argparse_option(
         WebServerParameters
     )
-    aa = vars(parser.parse_args(args=args))
-    print(aa)
+    # aa = vars(parser.parse_args(args=args))
+    # print(aa)
     return WebServerParameters(**vars(parser.parse_args(args=args))) 
 
     
@@ -80,7 +90,12 @@ def run_webserver(param: WebServerParameters = None):
         setup_logging(
             "mapgpt", logging_level=param.log_level, logger_filename=param.log_file
         )
+
     mount_routers(app) # 注册路由
     run_uvicorn(param)
-if __name__ == "__main__":
-    run_webserver()
+
+
+@app.get('/')
+async def root():
+    return {'message': 'Hello World'}
+run_webserver()
