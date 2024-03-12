@@ -5,16 +5,18 @@ def json_to_markdown(data, level=1):
     """
     markdown = ""
     for item in data:
-        title = item.get("title")
+        if type(item) is str:
+            title = item
+        else:
+            title = item.get("title")
         if title:
             markdown += "#" * level + " " + title + "\n"
-        sub_directory = item.get("directory")
-        if isinstance(sub_directory, list) and not isinstance(
-                sub_directory[0], dict):  # 如果子目录是字符串列表
-            markdown += '\n'.join(
-                ["#" * (level + 1) + " " + s for s in sub_directory]) + "\n"
-        elif sub_directory:
-            markdown += json_to_markdown(sub_directory, level + 1)
+        sub_directory =item.get("directory") if type(item) is not str else None
+        if sub_directory:
+            if not isinstance(sub_directory, list):
+                sub_directory = [sub_directory]
+            else:
+                markdown += json_to_markdown(sub_directory, level + 1)
     return markdown
 
 
