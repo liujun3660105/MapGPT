@@ -5,9 +5,9 @@ import asyncio
 from controller.write_tutorial.role import TutorialAssistant
 
 async def main():
-    topic = "Write a tutorial about MySQL"
+    demand = "Write a tutorial about MySQL"
     role = TutorialAssistant(language="Chinese")
-    await role.run(topic)
+    await role.run(demand)
     
 if __name__ == "__main__":
     asyncio.run(main())

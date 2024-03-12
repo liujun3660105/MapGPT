@@ -3,8 +3,8 @@ from dotenv import load_dotenv, find_dotenv
 
 _ = load_dotenv(find_dotenv())
 from fastapi import APIRouter, Depends, File, Form, UploadFile, Depends
-from pydantic import BaseModel
-from typing import Any
+from pydantic import BaseModel,Field
+from typing import Any,Optional
 from fastapi.responses import StreamingResponse
 import asyncio
 from controller.write_tutorial.role import TutorialAssistant
@@ -15,36 +15,36 @@ from Utils.data_handle import insert_into_markdown
 router = APIRouter()
 
 
-topic = "Write a tutorial about MySQL"
-role = TutorialAssistant(language="Chinese")
+# demand = "Write a tutorial about MySQL"
+# role = TutorialAssistant(language="Chinese")
 
 
 class Service:
     @classmethod
-    async def create_message(cls,with_message:str):
-        role = TutorialAssistant()
-        role.run()
-        if with_message:
-            msg = None
-        if isinstance(with_message, str):
-                msg = Message(content=with_message)
-        elif isinstance(with_message, Message):
-                msg = with_message
-        elif isinstance(with_message, list):
-                msg = Message(content="\n".join(with_message))
-        if not msg.cause_by:
-                msg.cause_by = UserRequirement
-        role.put_message(msg)
-        if not await role._observe():
-            # If there is no new information, suspend and wait
-            # logger.debug(f"{self._setting}: no news. waiting.")
-            return
-        # role.run(topic)
-        role._set_state(0)
-        todo = role.rc.todo
-        msg = role.rc.memory.get(k=1)[0]
-        role.topic = msg.content
-        resp = await todo.run(topic=role.topic)
+    async def create_message(cls,demand:str,model:list[str],api_key:str,document_type:str,directory:Optional[str],word_number:int):
+        role = TutorialAssistant(document_type=document_type,directory=directory,demand=demand,word_number = word_number)
+        resp = await role.run(demand)
+        # if demand:
+        #     msg = None
+        # if isinstance(demand, str):
+        #         msg = Message(content=demand)
+        # elif isinstance(demand, Message):
+        #         msg = demand
+        # elif isinstance(demand, list):
+        #         msg = Message(content="\n".join(demand))
+        # if not msg.cause_by:
+        #         msg.cause_by = UserRequirement
+        # role.put_message(msg)
+        # if not await role._observe():
+        #     # If there is no new information, suspend and wait
+        #     # logger.debug(f"{self._setting}: no news. waiting.")
+        #     return
+        # # role.run(demand)
+        # role._set_state(0)
+        # todo = role.rc.todo
+        # msg = role.rc.memory.get(k=1)[0]
+        # role.demand = msg.content
+        # resp = await todo.run(demand=role.demand)
         await role._handle_directory(resp)
         
         start_idx = role.rc.state if role.rc.state >= 0 else 0
@@ -76,40 +76,17 @@ class Service:
     #     return rsp  # return output from the last action
 
 class ChatQueryModel(BaseModel):
-    query: str
-
-async def output():
-    tasks = [asyncio.create_task(generator_msg()),asyncio.create_task(generator_msg()),asyncio.create_task(generator_msg())]
-    done,pending = await asyncio.wait(tasks)
-    for task in done:
-        yield task.result()
-    # for task in tasks:
-    #     result =await task
-    #     yield result
-        
-    # while True:
-    #     print('loop')
-    #     await task
-    #     # print('result',result)
-    #     yield 'ffff'
-    #     if task.done():
-    #         print('done')
-    #         break
-        
-
-async def generator_msg():
-    # print('1111')
-    a = 0
-    for i in range(10):
-        a+=i
-        # yield f"data: event {i}\n\n"
-        await asyncio.sleep(1)
-    return a
-        
+    api_key: str = Field(default="", description="the model api_key")
+    demand: str = Field(default="", description="docs demand")
+    directory: str = Field(default="", description="the docs custorm directory")
+    document_type: str = Field(default="", description="the docs type")
+    model: list[str] = Field(default=['aa','fff'],description="model")
+    wordNumber:int = Field(default=200,description="model")
+   
 
 @router.post("/chat/docs-agent",response_model=str)
 async def root(chatQuery: ChatQueryModel):
     print('chatQuery', chatQuery)
-    return StreamingResponse(Service.create_message(with_message=topic),media_type="text/event-stream")
-    return StreamingResponse(output(),
-                            media_type="text/event-stream")
+    return StreamingResponse(Service.create_message(demand=chatQuery.demand,model =chatQuery.model,api_key=chatQuery.api_key,document_type=chatQuery.document_type,directory=chatQuery.directory,word_number = chatQuery.wordNumber ),media_type="text/event-stream")
+    # return StreamingResponse(output(),
+    #                         media_type="text/event-stream")

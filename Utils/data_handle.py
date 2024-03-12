@@ -18,17 +18,16 @@ def json_to_markdown(data, level=1):
     return markdown
 
 
-
-def find_leaf_nodes(directory):
+def find_leaf_nodes(directory)->list:
+    """寻找叶子节点"""
     leaf_nodes = []
     def traverse(node):
         if isinstance(node, dict) and 'directory' in node:
-            traverse(node['directory'])
-        elif isinstance(node, list):
-            for item in node:
+            for item in node['directory']:
                 traverse(item)
-        else:
-            leaf_nodes.append(node)
+        elif isinstance(node,
+                        dict) and 'title' in node and 'directory' not in node:
+            leaf_nodes.append(node['title'])
     for item in directory:
         traverse(item)
     return leaf_nodes

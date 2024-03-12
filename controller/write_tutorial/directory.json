@@ -3,16 +3,17 @@
         "title": "1xxx",
         "directory": [
             {
-                "title": "1.1:xxx",
+                "title": "1.1xxx",
                 "directory": [
-                    "1.1.1xxx",
-                    "1.1.2xxx"
+                    {"title":"1.1.1xxx"},
+                    {"title":"1.1.2xxx"}
                 ]
             },
             {
+                "title":"1.2xxx",
                 "directory": [
-                    "1.2xxx",
-                    "1.3xxxx"
+                    {"title":"1.2.1xxx"},
+                    {"title":"1.2.3xxx"}
                 ]
             }
         ]
@@ -23,34 +24,34 @@
             {
                 "title": "2.1xxx",
                 "directory": [
-                    "2.1.1xxx",
-                    "2.1.2xxx"
+                    {"title":"2.1.1xxx"},
+                    {"title":"2.1.2xxx"}
                 ]
             },
             {
                 "directory": {
                     "title": "2.2:xxx",
                     "directory": [
-                        "2.2.1xxx",
-                        "2.2.2xxx"
+                        {"title":"2.2.1xxx"},
+                        {"title":"2.2.2xxx"}
                     ]
                 }
             },
             {
-                "title": "2.3:xxx",
+                "title": "2.3xxx",
                 "directory": [
                     {
                         "title": "2.3.1xxx",
                         "directory": [
-                            "2.3.1.1xxx",
-                            "2.3.1.2xxx"
+                            {"title":"2.3.1.1xxx"},
+                            {"title":"2.3.1.2xxx"}
                         ]
                     },
                     {
                         "title": "2.3.2xxx",
                         "directory": [
-                            "2.3.2.1xxx",
-                            "2.3.2.2xxx"
+                            {"title":"2.3.2.1xxx"},
+                            {"title":"2.3.2.2xxx"}
                         ]
                     }
                 ]
