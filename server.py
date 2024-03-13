@@ -8,12 +8,11 @@ import sys
 from typing import List
 
 from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from Utils.logUtils import logging_str_to_uvicorn_level,setup_logging,_get_logging_level
 from MapAgent.InitAgent import start_agent
-from MapAgent.MapGPT import MapGPT
+
 from router import chat
 from router import docs_agent
 
@@ -36,6 +35,9 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+# def do_some_business_logic():
+#     raise Exception("I do not want to do any work!")
+
 
 
 def mount_routers(app: FastAPI):
