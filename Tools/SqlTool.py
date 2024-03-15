@@ -6,7 +6,7 @@ from Utils.PythonExecUtil import execute_python_code
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.llm import LLMChain
 from .ExcelTool import get_first_n_rows, get_column_names
-from .DataBaseTool import execute_sql_search,get_example_data,get_table_spatial_ref
+# from .DataBaseTool import execute_sql_search,get_example_data,get_table_spatial_ref
 
 class SqlAnalyser:
 

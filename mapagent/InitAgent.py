@@ -57,8 +57,8 @@ def start_agent():
         document_generation_tool,
         email_tool,
         excel_inspection_tool,
-        database_table_choose_tool,
-        database_inspection_tool
+        # database_table_choose_tool,
+        # database_inspection_tool
     ]
 
     # 添加文件管理工具
