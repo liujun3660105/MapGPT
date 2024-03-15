@@ -12,8 +12,6 @@ _ = load_dotenv(find_dotenv())
 
 from MapAgent.MapGPT import MapGPT
 from langchain.chat_models import ChatOpenAI
-# from langchain_community.llms.tongyi import Tongyi
-from langchain_community.chat_models.tongyi import ChatTongyi
 from langchain.vectorstores import Chroma
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
@@ -40,17 +38,13 @@ def start_agent():
 
     # callback = AsyncIteratorCallbackHandler()
     # 语言模型
-    llm_openai = ChatOpenAI(
+    llm = ChatOpenAI(
         model="gpt-4-1106-preview",
         temperature=0,
         model_kwargs={
             "seed": 42
         },
         # callbacks = [callback]
-    )
-    llm = ChatTongyi(
-        streaming=True,
-        # cache=True
     )
 
     # 存储长时记忆的向量数据库
@@ -63,8 +57,8 @@ def start_agent():
         document_generation_tool,
         email_tool,
         excel_inspection_tool,
-        database_table_choose_tool,
-        database_inspection_tool
+        # database_table_choose_tool,
+        # database_inspection_tool
     ]
 
     # 添加文件管理工具
