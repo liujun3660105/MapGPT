@@ -3,15 +3,21 @@ from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
 from MapAgent.MapGPT import MapGPT
-from langchain.chat_models import ChatOpenAI
-from langchain.vectorstores import Chroma
-from langchain.embeddings.openai import OpenAIEmbeddings
+# from langchain.chat_models import ChatOpenAI
+from langchain_community.llms.tongyi import Tongyi
+# from langchain.vectorstores import Chroma
+from langchain_community.vectorstores.chroma import Chroma
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
+# from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import Document
 from Tools import *
 from Tools.PythonTool import ExcelAnalyser
 from Tools.SqlTool import SqlAnalyser
-from langchain.agents.agent_toolkits import FileManagementToolkit
+from langchain.agents.agent_toolkits.file_management import FileManagementToolkit
+from Utils.device import get_device
+from config.config import Config
 
+CFG = Config()
 
 def launch_agent(agent: MapGPT):
     human_icon = "\U0001F468"
@@ -28,16 +34,24 @@ def launch_agent(agent: MapGPT):
 def main():
 
     # 语言模型
-    llm = ChatOpenAI(
-        model="gpt-4-1106-preview",
-        temperature=0,
-        model_kwargs={
-            "seed": 42
-        },
+    # llm = ChatOpenAI(
+    #     model="gpt-4-1106-preview",
+    #     temperature=0,
+    #     model_kwargs={
+    #         "seed": 42
+    #     },
+    # )
+    llm = Tongyi()
+    model_kwargs = {'device': get_device()}
+    encode_kwargs = {'normalize_embeddings': False}
+    hf_embeddings = HuggingFaceEmbeddings(
+        model_name=CFG.EMBEDDING_PATH,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs
     )
 
     # 存储长时记忆的向量数据库
-    db = Chroma.from_documents([Document(page_content="")], OpenAIEmbeddings(model="text-embedding-ada-002"))
+    db = Chroma.from_documents([Document(page_content="")], hf_embeddings)
     retriever = db.as_retriever(search_kwargs=dict(k=1))
 
     # 自定义工具集

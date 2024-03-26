@@ -9,7 +9,7 @@ from .FileQATool import ask_docment
 from .WriterTool import writer_chain
 from .EmailTool import send_email
 from .ExcelTool import get_first_n_rows, get_column_names
-# from .DataBaseTool import get_all_tables,get_example_data
+from .DataBaseTool import get_all_tables,get_example_data
 
 
 
@@ -37,15 +37,15 @@ excel_inspection_tool = StructuredTool.from_function(
     description="探查表格文件的内容和结构，展示它的列名和前n行，n默认为3",
 )
 
-# database_table_choose_tool = StructuredTool.from_function(
-#     func=get_all_tables,
-#     name="InspectDataBaseTable",
-#     description="探查数据库中的所有表，展示它的表明和表的字段",
-# )
+database_table_choose_tool = StructuredTool.from_function(
+    func=get_all_tables,
+    name="InspectDataBaseTable",
+    description="探查数据库中的所有表，展示它的表明和表的字段",
+)
 
-# database_inspection_tool = StructuredTool.from_function(
-#     func=get_example_data,
-#     name="InspectDataBase",
-#     description="探查数据库中某个表的内容和结构，展示它的列名和前n行，n默认为3",
-# )
+database_inspection_tool = StructuredTool.from_function(
+    func=get_example_data,
+    name="InspectDataBase",
+    description="探查数据库中某个表的内容和结构，展示它的列名和前n行，n默认为3",
+)
 

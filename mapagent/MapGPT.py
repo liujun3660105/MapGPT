@@ -12,7 +12,6 @@ from pydantic import ValidationError
 from MapAgent.Action import Action
 from Utils.PromptTemplateBuilder import PromptTemplateBuilder
 from Utils.PrintUtils import *
-import asyncio
 from langchain.callbacks import AsyncIteratorCallbackHandler
 
 class MapGPT:
