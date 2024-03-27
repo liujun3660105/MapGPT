@@ -7,7 +7,7 @@ import os
 import sys
 from typing import List
 
-from fastapi import FastAPI
+from fastapi import FastAPI,WebSocket,WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from Utils.logUtils import logging_str_to_uvicorn_level,setup_logging,_get_logging_level
@@ -16,6 +16,8 @@ from MapAgent.InitAgent import start_agent
 from router import chat
 from router import docs_agent
 from router import map_interact
+import websockets
+import asyncio
 
 origins = ["*"]
 
@@ -26,12 +28,25 @@ app = FastAPI(
     openapi_tags=[],
 )
 
+
+async def hello(websocket,path):
+    name = await websocket.recv()
+    print('receive_name',name)
+    await websocket.send('hello, '+name)
+
+def start_ws(ws_func):
+    start_ws_server = websockets.serve(ws_func, "localhost", 8123)
+    print('start_ws_server',start_ws_server)
+    asyncio.get_event_loop().run_until_complete(start_ws_server)
+    asyncio.get_event_loop().run_forever()
+
 # 添加跨域中间件
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
+        # allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -77,10 +92,21 @@ def run_webserver(param: WebServerParameters = None):
         )
 
     mount_routers(app) # 注册路由
+    # start_ws(hello)
     run_uvicorn(param)
+    
 
 
-@app.get('/')
-async def root():
-    return {'message': 'Hello World'}
+# @app.get('/')
+# async def root():
+#     return {'message': 'Hello World'}
+
+
+# @app.websocket("/ws")
+# async def websocket_endpoint(websocket: WebSocket):
+#     await websocket.accept()
+#     while True:
+#         data = await websocket.receive_text()
+#         await websocket.send_text(f"Message text was: {data}")
+        
 run_webserver()
