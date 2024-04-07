@@ -1,31 +1,27 @@
-#!/usr/bin/env python3
-# _*_ coding: utf-8 _*_
-"""
-@Time    : 2023/9/4 15:40:40
-@Author  : Stitch-z
-@File    : tutorial_assistant.py
-"""
 
-from datetime import datetime
-from typing import Dict
+#1.根据文档进行普通的问答
+#2.招标文件和投标文件的智慧问答
+#3.根据问题自动筛选出不符合条件的部分
+
 
 # from metagpt.actions.write_tutorial import WriteContent, WriteDirectory
-from .action import GetTableNameAndField, SqlGenerator,SqlExecutor
+from .action import Retriever
 # from metagpt.const import TUTORIAL_PATH
 from metagpt.logs import logger
 from metagpt.roles.role import Role, RoleReactMode
 from metagpt.schema import Message
-from Utils.data_handle import json_to_markdown,find_leaf_nodes
 from metagpt.utils.repair_llm_raw_output import extract_state_value_from_output
 from metagpt.provider import HumanProvider
 from metagpt.actions import Action,ActionOutput
 from metagpt.actions.action_node import ActionNode
 from typing import TYPE_CHECKING, Iterable, Optional, Set, Type, Union
-from .prompt import STATE_TEMPLATE,PREFIX_TEMPLATE
 from metagpt.actions.add_requirement import UserRequirement
+from langchain_community.vectorstores.chroma import Chroma
+
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
 # from Utils import const
 
-class GeoAnalysisAssistant(Role):
+class BidingAssistant(Role):
     """geoAnalysis assistant, follow user's requirements and get the right result.
 
     Args:
@@ -46,7 +42,7 @@ class GeoAnalysisAssistant(Role):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.set_actions([GetTableNameAndField(language=self.language),SqlGenerator()])
+        self.set_actions([Retriever(language=self.language)])
         self._set_react_mode(react_mode=RoleReactMode.BY_ORDER.value)
     
     

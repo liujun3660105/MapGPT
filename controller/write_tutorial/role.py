@@ -1,25 +1,11 @@
-#!/usr/bin/env python3
-# _*_ coding: utf-8 _*_
-"""
-@Time    : 2023/9/4 15:40:40
-@Author  : Stitch-z
-@File    : tutorial_assistant.py
-"""
 
-from datetime import datetime
-from typing import Dict
-
-# from metagpt.actions.write_tutorial import WriteContent, WriteDirectory
 from .action import WriteContent, WriteDirectory,RviewDirectory
 from .prompt import DocumentTypeList
-# from metagpt.const import TUTORIAL_PATH
 from metagpt.logs import logger
 from metagpt.roles.role import Role, RoleReactMode
 from metagpt.schema import Message
-from metagpt.utils.file import File
-from Utils.const import TUTORIAL_PATH
 from Utils.data_handle import json_to_markdown,find_leaf_nodes
-# from Utils import const
+
 
 
 
