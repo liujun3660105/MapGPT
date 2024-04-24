@@ -10,7 +10,7 @@ from .DataBaseTool import execute_sql_search,get_example_data,get_table_spatial_
 
 class SqlAnalyser:
 
-    def __init__(self, prompts_path, prompt_file="database_analyser.json"):
+    def __init__(self, prompts_path='', prompt_file="database_analyser.json"):
         self.prompt = PromptTemplateBuilder(prompts_path, prompt_file).build()
 
     def analyse(self, query,table_name):

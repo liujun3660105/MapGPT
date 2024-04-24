@@ -18,7 +18,8 @@ from urllib.parse import quote
 from urllib.parse import quote_plus as urlquote
 
 import regex as re
-
+import geojson
+import json
 
 class BaseConnect(ABC):
     def get_table_names(self) -> Iterable[str]:
@@ -154,8 +155,6 @@ class BaseConnect(ABC):
         """Return whether the connector is a normal type."""
         return True
 
-
-CFG = Config()
 
 
 def _format_index(index: sqlalchemy.engine.interfaces.ReflectedIndex) -> str:
@@ -455,7 +454,61 @@ class RDBMSDatabase(BaseConnect):
     def query_table_schema(self, table_name):
         sql = f"select * from {table_name} limit 1"
         return self._query(sql)
-
+    
+    def query_exe(self, query, fetch: str = "all"):
+        """
+        only for query
+        Args:
+            session:
+            query:
+            fetch:
+        Returns:
+        """
+        if not query:
+            return [], None
+        cursor = self.session.execute(text(query))
+        if cursor.returns_rows:
+            if fetch == "all":
+                result = cursor.fetchall()
+            elif fetch == "one":
+                result = cursor.fetchone()  # type: ignore
+            else:
+                raise ValueError("Fetch parameter must be either 'one' or 'all'")
+            field_names = list(i[0:] for i in cursor.keys())
+            if 'geom' in field_names:
+                features = self.records_to_geojson(field_names, result)
+            else:
+                features = self.records_to_json(field_names,result)
+        return json.dumps(features)
+    
+    def records_to_geojson(self, keys:list[str],rows:list[tuple]):
+        features = []
+        for row in rows:
+            properties = {}
+            geometry = {}
+            for key,value in zip(keys,list(row)):
+                if key !='geom':
+                    properties[key] = value
+                else:
+                    geometry=geojson.loads(value)
+            features.append({
+                "type": "Feature",
+                "properties": properties,
+                "geometry": geometry
+            })
+        return {
+            "type": "FeatureCollection",
+            "features": features
+        }
+    def records_to_json(self,keys:list[str],rows:list[tuple]):
+        features= []
+        for row in rows:
+            feature = {}
+            for key,value in zip(keys,list(row)):
+                feature[key]=value
+            features.append(feature)
+        return features
+    
     def query_ex(self, query, fetch: str = "all"):
         """
         only for query
@@ -465,7 +518,6 @@ class RDBMSDatabase(BaseConnect):
             fetch:
         Returns:
         """
-        print(f"Query[{query}]")
         if not query:
             return [], None
         cursor = self.session.execute(text(query))

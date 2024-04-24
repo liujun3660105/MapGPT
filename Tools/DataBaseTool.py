@@ -37,8 +37,15 @@ def get_example_data(table_name,example_length=3):
     return result
 
 def execute_sql_search(sql):
-    result = db.query_ex(sql,'all')
-    return f'结果为{result[1]}'
+    result = db.query_exe(sql,'all')
+    return f'{result[1]}'
+
+def execute_sql_search_json(sql):
+    result = db.query_exe(sql,'all')
+    return result
+
+def execute_rollback():
+    db.session.rollback()
 
 def get_table_spatial_ref(table_name):
     result = db.query_ex(f'select st_srid(geom) from {table_name} limit 1','one')

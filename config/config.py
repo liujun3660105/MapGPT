@@ -18,7 +18,14 @@ class Config:
     LOCAL_DB_POOL_SIZE = int(os.getenv("LOCAL_DB_POOL_SIZE", 10))
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     OPENAI_API_BASE=os.getenv("OPENAI_API_BASE")
-     
+    EMBEDDING_PATH = os.getenv('EMBEDDING_PATH')
+    BAIDU_API_KEY = os.getenv("BAIDU_API_KEY")
+    BAIDU_SECRET_KEY = os.getenv("BAIDU_SECRET_KEY")
+    MILVUS_HOST = os.getenv("MILVUS_HOST")
+    MILVUS_PORT = os.getenv("MILVUS_PORT")
+    MILVUS_USERNAME = os.getenv("MILVUS_USERNAME")
+    MILVUS_PASSWORD = os.getenv("MILVUS_PASSWORD")
+    DASHSCOPE_API_KEY = os.getenv("DASHSCOPE_API_KEY")
     def __post_init__(self):
         if self.LOCAL_DB_HOST is None:
             self.LOCAL_DB_HOST = "127.0.0.1"
