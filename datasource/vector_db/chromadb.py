@@ -7,6 +7,8 @@ from Utils.device import get_device
 from config.config import Config
 from Utils.const import get_root_path
 from enum import Enum
+
+from datasource.vector_db.base import VectorDB
 class FileType(Enum):
     """
     file type
@@ -28,7 +30,7 @@ hf_embeddings = HuggingFaceEmbeddings(
 
     
 
-class ChromaDB():
+class ChromaDB(VectorDB):
     qa_biding_vectordb:Chroma= Field(default_factory=Chroma())
     qa_tending_vectordb:Chroma= Field(default_factory=Chroma())
     current_vectordb:Chroma= Field(default_factory=Chroma())
