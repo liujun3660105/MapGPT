@@ -26,6 +26,11 @@ class MilvusClient(BaseModel,VectorDB):
 
     async def aadd_documents(self,docs:List[Document]):
         await self.vector_db.aadd_documents(docs)
+    
+    
+    async def aquery_documents(self,query:str,top_k:int):
+        # 向量搜索
+        return await self.vector_db.asimilarity_search(query,top_k)
     def insert_vectors(self, collection_name, vectors):
         # 插入向量的逻辑
         print(f"Inserting vectors into collection '{collection_name}'")

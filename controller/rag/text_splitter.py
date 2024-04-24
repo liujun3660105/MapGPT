@@ -16,7 +16,7 @@ embeddings = HuggingFaceEmbeddings(
 
 class TextSplitter():
     @staticmethod
-    def get_text_splitter(text_splitter_name: str,chunk_size = 50,chunk_overlap=5):
+    def get_text_splitter(text_splitter_name: str,chunk_size = 100,chunk_overlap=5):
         if text_splitter_name == "recursive_char_text_splitter":
             return RecursiveCharacterTextSplitter(separators=separators,chunk_size=chunk_size,chunk_overlap=chunk_overlap,length_function=len)
         elif text_splitter_name == "nltk_text_splitter":

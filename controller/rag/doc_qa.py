@@ -17,6 +17,8 @@ from langchain.schema.output_parser import StrOutputParser
 from langchain.schema import Document
 from llm.langchain.qianwen import ChatDashScope
 from llm.langchain.tongyi import Tongyi
+from controller.rag.local_rerank import LocalRerankBackend
+from Utils.decrator import get_time
 
 
 
@@ -35,23 +37,14 @@ class DocQA:
                                       user=CFG.MILVUS_USERNAME,
                                       password=CFG.MILVUS_PASSWORD,
                                       embeddings=self.embeddings)
-        # self.local_file: List[LocalFile] = []
         self.memory = ConversationBufferMemory(memory_key="chat_history",
                                                return_messages=True,
                                                return_source_documents=True)
-        # callback = AsyncIteratorCallbackHandler()
-        # llm = QianfanChatEndpoint(model_name='ERNIE-4.0-8K',
-        #                           qianfan_ak=CFG.BAIDU_API_KEY,
-        #                           qianfan_sk=CFG.BAIDU_SECRET_KEY,
-        #                           streaming=True,
-        #                           callbacks=[callback])
-        # self.chain = ConversationalRetrievalChain.from_llm(llm = llm,verbose=True,retriever=self.vector_db.vector_db.as_retriever(),memory=self.memory)
+        self.local_rerank_backend = LocalRerankBackend()
 
     async def add_local_file(self, local_file: LocalFile):
         local_file.split_file_to_document()
-        # local_file.save_to_vectordb(self.vector_db)
         await self.vector_db.aadd_documents(local_file.docs)
-        # self.local_file.append(local_file)
 
     async def aask(self, query: str):
         callback = AsyncIteratorCallbackHandler()
@@ -90,7 +83,19 @@ class DocQA:
     def format_docs(self, docs: List[Document]):
         return "\n\n".join(doc.page_content for doc in docs)
 
+    @get_time
+    async def similar_search(self,query:str)->str:
+        # 根据问题进行相似性检索，并通过rerank进行重排，返回结果融合后的字符串
+        docs:List[Document] = await self.vector_db.aquery_documents(query, top_k=5)
+        similar_str_list = map(lambda x:x.page_content,docs)
+        scores = self.local_rerank_backend.predict(query,similar_str_list)
+        for idx, score in enumerate(scores):
+            docs[idx].metadata['score'] = score
+        source_documents = sorted(docs, key=lambda x: x.metadata['score'], reverse=True)
+        return self.format_docs(source_documents)
+
     async def aask_custom_chain(self, query: str):
+        similar_str = await self.similar_search(query)
         callback = AsyncIteratorCallbackHandler()
         # llm = QianfanChatEndpoint(model_name='ERNIE-4.0-8K',
         #                           qianfan_ak=CFG.BAIDU_API_KEY,
@@ -99,11 +104,10 @@ class DocQA:
         #                           callbacks=[callback])
         llm = Tongyi(dashscope_api_key=CFG.DASHSCOPE_API_KEY,streaming=True,callbacks=[callback])
         prompt = PromptTemplate(
-            input_variables=["context", "query", ], template=RAG,partial_variables={"chatHistory":self.memory.load_memory_variables({})})
+            input_variables=[ "query" ], template=RAG,partial_variables={"chatHistory":self.memory.load_memory_variables({}),"context":similar_str})
         chain = ({
-            "context":
-            self.vector_db.vector_db.as_retriever() | self.format_docs,
-            # "chatHistory": lambda x:x['chatHistory'],
+            # "context":
+            # self.vector_db.vector_db.as_retriever() | self.format_docs,
             "query": RunnablePassthrough(),
             # "query": lambda x: x["query"],
         } | prompt | llm | StrOutputParser())
@@ -121,12 +125,6 @@ class DocQA:
         
     async def aask_custom_multi_chain(self, query: str):
         callback = AsyncIteratorCallbackHandler()
-        # llm = QianfanChatEndpoint(model_name='ERNIE-4.0-8K',
-        #                           qianfan_ak=CFG.BAIDU_API_KEY,
-        #                           qianfan_sk=CFG.BAIDU_SECRET_KEY,
-        #                           streaming=True,
-        #                           callbacks=[callback])
-        # llm = ChatDashScope(api_key=CFG.DASHSCOPE_API_KEY,callbacks=[callback])
         llm = Tongyi(dashscope_api_key=CFG.DASHSCOPE_API_KEY,streaming=True,callbacks=[callback])
         
         prompt = PromptTemplate(
