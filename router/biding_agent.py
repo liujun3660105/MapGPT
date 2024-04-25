@@ -11,7 +11,7 @@ from langchain.callbacks import AsyncIteratorCallbackHandler
 import asyncio
 from controller.map_interact.action import ResultSummarizer
 from metagpt.logs import logger
-from PyPDF2 import PdfReader
+from PyPDF2 import PdfReader,PdfFileReader
 from langchain.text_splitter import CharacterTextSplitter,RecursiveCharacterTextSplitter
 from langchain_community.vectorstores.chroma import Chroma
 from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings

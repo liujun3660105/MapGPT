@@ -1,5 +1,7 @@
 import re
 import json
+import os
+import time
 
 def json_to_markdown(data, level=1):
     """
@@ -70,3 +72,28 @@ def extract_potential_geojson(input_string:str):
         return potential_geojson_dict
     else:
         return None
+    
+    
+def truncate_filename(filename, max_length=200):
+    # 获取文件名后缀
+    file_ext = os.path.splitext(filename)[1]
+
+    # 获取不带后缀的文件名
+    file_name_no_ext = os.path.splitext(filename)[0]
+
+    # 计算文件名长度，注意中文字符
+    filename_length = len(filename.encode('utf-8'))
+
+    # 如果文件名长度超过最大长度限制
+    if filename_length > max_length:
+        # 生成一个时间戳标记
+        timestamp = str(int(time.time()))
+        # 截取文件名
+        while filename_length > max_length:
+            file_name_no_ext = file_name_no_ext[:-4]
+            new_filename = file_name_no_ext + "_" + timestamp + file_ext
+            filename_length = len(new_filename.encode('utf-8'))
+    else:
+        new_filename = filename
+
+    return new_filename

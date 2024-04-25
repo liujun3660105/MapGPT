@@ -21,7 +21,16 @@ class Config:
     EMBEDDING_PATH = os.getenv('EMBEDDING_PATH')
     BAIDU_API_KEY = os.getenv("BAIDU_API_KEY")
     BAIDU_SECRET_KEY = os.getenv("BAIDU_SECRET_KEY")
-     
+    MILVUS_HOST = os.getenv("MILVUS_HOST")
+    MILVUS_PORT = os.getenv("MILVUS_PORT")
+    MILVUS_USERNAME = os.getenv("MILVUS_USERNAME")
+    MILVUS_PASSWORD = os.getenv("MILVUS_PASSWORD")
+    DASHSCOPE_API_KEY = os.getenv("DASHSCOPE_API_KEY")
+    LOCAL_RERANK_SERVICE_URL = os.getenv("LOCAL_RERANK_SERVICE_URL")
+    LOCAL_RERANK_MODEL_NAME = os.getenv("LOCAL_RERANK_MODEL_NAME")
+    LOCAL_RERANK_MAX_LENGTH = os.getenv("LOCAL_RERANK_MAX_LENGTH")
+    LOCAL_RERANK_BATCH = os.getenv("LOCAL_RERANK_BATCH")
+    LOCAL_RERANK_MODEL_PATH = os.getenv("LOCAL_RERANK_MODEL_PATH")
     def __post_init__(self):
         if self.LOCAL_DB_HOST is None:
             self.LOCAL_DB_HOST = "127.0.0.1"
