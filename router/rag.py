@@ -44,7 +44,7 @@ async def root(parserQuery:FileParserModel):
     except Exception as e:
         logger.debug((f"load document has error: {e}"))
         raise HTTPException(status_code=500, detail=f"load document has error: {e}")
-    return {"uploadStatus": 'success'}
+    return {"fileParserStatus": 'success'}
 
 
 @router.post("/rag/chat")
