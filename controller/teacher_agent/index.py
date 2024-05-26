@@ -20,6 +20,7 @@ from config.config import Config
 import asyncio
 from langchain.chat_models.openai import ChatOpenAI
 from langchain_openai import ChatOpenAI
+from llm.langchain.qianwen import ChatDashScope
 
 CFG = Config()
 
@@ -74,18 +75,20 @@ class TeacherAgent(BaseModel):
         #                     qianfan_sk=CFG.BAIDU_SECRET_KEY,
         #                     streaming=True,
         #                     callbacks=[callback])
-        llm = ChatOpenAI(
-            openai_proxy=CFG.OPENAI_API_BASE,
-            openai_api_key = CFG.OPENAI_API_KEY,
-            model="gpt-4-1106-preview",
-            temperature=0,
-            streaming=True,
-            model_kwargs={
-                "seed": 42,
-            },
+    #     llm = ChatOpenAI(
+    #         openai_proxy=CFG.OPENAI_API_BASE,
+    #         openai_api_key = CFG.OPENAI_API_KEY,
+    #         model="gpt-4-1106-preview",
+    #         temperature=0,
+    #         streaming=True,
+    #         model_kwargs={
+    #             "seed": 42,
+    #         },
             
-        callbacks = [callback]
-    )
+    #     callbacks = [callback]
+    # )
+        llm = ChatDashScope(api_key=CFG.DASHSCOPE_API_KEY,
+                            callbacks=[callback])
         prompt = PromptTemplate(input_variables=["history", "input"], template=template)
         chain = (prompt|llm|StrOutputParser())
         content = ''
@@ -118,6 +121,7 @@ class TeacherAgent(BaseModel):
             model_kwargs={
                 "seed": 42,
             },
+            
             
         callbacks = [callback]
     )

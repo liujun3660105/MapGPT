@@ -22,7 +22,7 @@ router = APIRouter()
 class Service:
     @classmethod
     async def create_message(cls,demand:str,model:list[str],api_key:str,document_type:str,directory:Optional[str],word_number:int):
-        config = Config.from_llm_config({'api_type': model[0], 'api_key': api_key, 'model': model[1]})
+        config = Config.config({'api_type': model[0], 'api_key': api_key, 'model': model[1]})
         role = TutorialAssistant(document_type=document_type,directory=directory,demand=demand,word_number = word_number,config=config)
         try:
             resp = await role.run(demand)

@@ -31,6 +31,9 @@ class Config:
     LOCAL_RERANK_MAX_LENGTH = os.getenv("LOCAL_RERANK_MAX_LENGTH")
     LOCAL_RERANK_BATCH = os.getenv("LOCAL_RERANK_BATCH")
     LOCAL_RERANK_MODEL_PATH = os.getenv("LOCAL_RERANK_MODEL_PATH")
+    NEO4J_URL = os.getenv("NEO4J_URL")
+    NEO4J_USERNAME = os.getenv("NEO4J_USERNAME")
+    NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
     def __post_init__(self):
         if self.LOCAL_DB_HOST is None:
             self.LOCAL_DB_HOST = "127.0.0.1"
