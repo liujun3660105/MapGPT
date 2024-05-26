@@ -11,12 +11,8 @@ from fastapi import FastAPI,WebSocket,WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from Utils.logUtils import logging_str_to_uvicorn_level,setup_logging,_get_logging_level
-from MapAgent.InitAgent import start_agent
 
-from router import chat
-from router import docs_agent
-from router import map_interact
-from router import biding_agent,teacher_agent,rag,vl
+from router import teacher_agent,vl,audio
 import websockets
 import asyncio
 
@@ -52,16 +48,11 @@ app.add_middleware(
 )
 
 
-
 def mount_routers(app: FastAPI):
     """Lazy import to avoid high time cost""" 
-    app.include_router(chat.router, prefix="/api/v1", tags=["chat"])
-    app.include_router(docs_agent.router, prefix="/api/v1", tags=["chat"])
-    app.include_router(map_interact.router, prefix="/api/v1", tags=["chat"])
-    app.include_router(biding_agent.router, prefix="/api/v1", tags=["chat"])
     app.include_router(teacher_agent.router, prefix="/api/v1", tags=["chat"])
-    app.include_router(rag.router, prefix="/api/v1", tags=["chat"])
     app.include_router(vl.router, prefix="/api/v1", tags=["chat"])
+    app.include_router(audio.router, prefix="/api/v1", tags=["chat"])
 
 def run_uvicorn(param: WebServerParameters):
     import uvicorn
