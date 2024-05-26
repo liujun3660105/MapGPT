@@ -16,7 +16,7 @@ from MapAgent.InitAgent import start_agent
 from router import chat
 from router import docs_agent
 from router import map_interact
-from router import biding_agent,teacher_agent,rag
+from router import biding_agent,teacher_agent,rag,vl
 import websockets
 import asyncio
 
@@ -61,6 +61,7 @@ def mount_routers(app: FastAPI):
     app.include_router(biding_agent.router, prefix="/api/v1", tags=["chat"])
     app.include_router(teacher_agent.router, prefix="/api/v1", tags=["chat"])
     app.include_router(rag.router, prefix="/api/v1", tags=["chat"])
+    app.include_router(vl.router, prefix="/api/v1", tags=["chat"])
 
 def run_uvicorn(param: WebServerParameters):
     import uvicorn

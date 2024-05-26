@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
-class BaseLLM(ABC):
-    temperature: float = 0
-    max_tokens: int = 50
-    streaming: bool = True
+from pydantic import BaseModel
+class BaseLLM(BaseModel,ABC):
     @abstractmethod
-    def generate_text(self, prompt):
+    def generate_text(self, messages:list[dict],timeout=3):
         pass
