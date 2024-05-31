@@ -5,7 +5,6 @@ from Utils.parameterUtils import _get_dataclass_print_str,_dict_to_command_args
 
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LOGDIR = os.getenv("MAPGPT_LOG_DIR", os.path.join(ROOT_PATH, "logs"))
-
 @dataclass
 class Config:
     LOCAL_DB_TYPE = os.getenv("LOCAL_DB_TYPE", "postgresql")
