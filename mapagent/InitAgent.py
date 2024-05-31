@@ -10,7 +10,7 @@ _ = load_dotenv(find_dotenv())
 
 # os.environ["DASHSCOPE_API_KEY"] = DASHSCOPE_API_KEY
 
-from MapAgent.MapGPT import MapGPT
+from mapagent.MapGPT import MapGPT
 # from langchain.chat_models import ChatOpenAI
 from langchain_community.llms.tongyi import Tongyi
 from langchain_community.llms.baidu_qianfan_endpoint import QianfanLLMEndpoint

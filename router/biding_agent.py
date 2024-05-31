@@ -5,7 +5,7 @@ _ = load_dotenv(find_dotenv())
 from fastapi import APIRouter, File, UploadFile, Form
 from pydantic import BaseModel
 from fastapi import HTTPException
-from MapAgent.MapGPT import MapGPT
+from mapagent.MapGPT import MapGPT
 from fastapi.responses import StreamingResponse
 from langchain.callbacks import AsyncIteratorCallbackHandler
 import asyncio

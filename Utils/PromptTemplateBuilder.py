@@ -9,7 +9,7 @@ import tempfile
 
 from langchain_core.prompts import PipelinePromptTemplate, BasePromptTemplate
 
-from MapAgent.Action import Action
+from mapagent.Action import Action
 
 
 def chinese_friendly(string) -> str:

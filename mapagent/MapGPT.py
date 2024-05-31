@@ -9,7 +9,7 @@ from langchain.tools.base import BaseTool
 from langchain.vectorstores.base import VectorStoreRetriever
 from pydantic import ValidationError
 
-from MapAgent.Action import Action
+from mapagent.Action import Action
 from Utils.PromptTemplateBuilder import PromptTemplateBuilder
 from Utils.PrintUtils import *
 from langchain.callbacks import AsyncIteratorCallbackHandler

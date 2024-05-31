@@ -11,7 +11,7 @@ from fastapi import FastAPI,WebSocket,WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from Utils.logUtils import logging_str_to_uvicorn_level,setup_logging,_get_logging_level
-from MapAgent.InitAgent import start_agent
+from mapagent.InitAgent import start_agent
 
 from router import chat
 from router import docs_agent

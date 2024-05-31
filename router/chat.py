@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile, Depends
 from pydantic import BaseModel
 from typing import Any, AsyncIterable
 from langchain.chat_models import ChatOpenAI
-from MapAgent.InitAgent import start_agent
-from MapAgent.MapGPT import MapGPT
+from mapagent.InitAgent import start_agent
+from mapagent.MapGPT import MapGPT
 from fastapi.responses import StreamingResponse
 from langchain.callbacks import AsyncIteratorCallbackHandler
 import asyncio

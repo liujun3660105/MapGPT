@@ -2,7 +2,7 @@
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
-from MapAgent.MapGPT import MapGPT
+from mapagent.MapGPT import MapGPT
 # from langchain.chat_models import ChatOpenAI
 from langchain_community.llms.tongyi import Tongyi
 # from langchain.vectorstores import Chroma
