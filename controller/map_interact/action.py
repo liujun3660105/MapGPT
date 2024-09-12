@@ -74,6 +74,7 @@ class SqlGenerator(Action):
                 prompt = SQL_GENERATOR.format(question=question,schema = schema,spatial_ref = spatial_ref,sql_history = self.sql_history)
                 result = await self._aask(prompt=prompt)
                 sql_code = SqlAnalyser(prompts_path="./prompts/tools")._extract_sql_code(result)
+                print('sql_code',sql_code)
                 execute_sql_search_json(sql_code)
                 success=True
             except Exception as e:
@@ -111,6 +112,7 @@ class SqlExecutor(Action):
             related table name and schema field
         """
         sql_code = SqlAnalyser(prompts_path="./prompts/tools")._extract_sql_code(sql)
+        print('sql_code',sql_code)
         result = execute_sql_search_json(sql_code)
         return f"已经拿到最后的结果，结果为:{result}"
         

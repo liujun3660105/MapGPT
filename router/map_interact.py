@@ -22,8 +22,14 @@ from metagpt.logs import logger
 from Utils.data_handle import extract_potential_geojson
 import json
 from Utils.ws_manager import WSConnectionManager
+from config.config import Config as envConfig
+from metagpt.config2 import Config
 
 router = APIRouter()
+CFG = envConfig()
+
+llm_config = {"api_type": "dashscope", "api_key": CFG.DASHSCOPE_API_KEY, "model": "qwen-plus"}
+qianwen = Config.from_llm_config(llm_config)
 
 # global ws
 # ws = None
@@ -38,8 +44,9 @@ class Service:
     @classmethod
     async def receive_message(cls,query:str,client_id:str):
         print(f'sse client_id is {client_id}')
-        role = GeoAnalysisAssistant()
+        role = GeoAnalysisAssistant(config = qianwen)
         res = await role.run(query) # 这是生成的sql语句
+        print('res',res)
         sql_execute_result = execute_sql_search_json(res.content)
         #判断是否是geojson数据
         geojson = extract_potential_geojson(sql_execute_result)
@@ -51,7 +58,7 @@ class Service:
         #如果是geojson数据，则直接返回给前端
         else:
         #最后用一个action进行总结
-            result = await ResultSummarizer().run(query = query,result = sql_execute_result)
+            result = await ResultSummarizer(config = qianwen).run(query = query,result = sql_execute_result)
             logger.info(result)
             yield f'data:{result}\n\n'      
 
