@@ -52,32 +52,6 @@ class GeoAnalysisAssistant(Role):
     
     async def run(self, with_message=None) -> Message | None:
         """Observe, and think and act based on the results of the observation"""
-        if with_message:
-            msg = None
-            if isinstance(with_message, str):
-                msg = Message(content=with_message)
-            elif isinstance(with_message, Message):
-                msg = with_message
-            elif isinstance(with_message, list):
-                msg = Message(content="\n".join(with_message))
-            if not msg.cause_by:
-                msg.cause_by = UserRequirement
-            self.put_message(msg)
-        if not await self._observe():
-            # If there is no new information, suspend and wait
-            logger.debug(f"{self._setting}: no news. waiting.")
-            return
-
-        rsp = await self.react()
-
-        # Reset the next action to be taken.
-        self.set_todo(None)
-        # Send the response message to the Environment object to have it relay the message to the subscribers.
-        self.publish_message(rsp)
-        return rsp
-        
-    async def run(self, with_message=None) -> Message | None:
-        """Observe, and think and act based on the results of the observation"""
         self.user_requirement = with_message
         if with_message:
             msg = None
@@ -102,6 +76,28 @@ class GeoAnalysisAssistant(Role):
         # Send the response message to the Environment object to have it relay the message to the subscribers.
         self.publish_message(rsp)
         return rsp
+    async def react(self) -> Message:
+        """Entry to one of three strategies by which Role reacts to the observed Message"""
+        if self.rc.react_mode == RoleReactMode.REACT:
+            rsp = await self._react()
+        elif self.rc.react_mode == RoleReactMode.BY_ORDER:
+            rsp = await self._act_by_order()
+        elif self.rc.react_mode == RoleReactMode.PLAN_AND_ACT:
+            rsp = await self._plan_and_act()
+        else:
+            raise ValueError(f"Unsupported react mode: {self.rc.react_mode}")
+        self._set_state(state=-1)  # current reaction is complete, reset state to -1 and todo back to None
+        return rsp
+    
+    async def _act_by_order(self) -> Message:
+        """switch action each time by order defined in _init_actions, i.e. _act (Action1) -> _act (Action2) -> ..."""
+        start_idx = self.rc.state if self.rc.state >= 0 else 0  # action to run from recovered state
+        rsp = Message(content="No actions taken yet")  # return default message if actions=[]
+        for i in range(start_idx, len(self.states)):
+            self._set_state(i)
+            rsp = await self._act()
+        return rsp  # return output from the last action
+        
         
     async def _think(self) -> bool:
         """Consider what to do and decide on the next course of action. Return false if nothing can be done."""

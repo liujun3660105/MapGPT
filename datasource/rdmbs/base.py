@@ -301,6 +301,7 @@ class RDBMSDatabase(BaseConnect):
         _sql = f"""
                 select concat(table_name, "(" , group_concat(column_name), ")") as schema_info from information_schema.COLUMNS where table_schema="{self.get_current_db_name()}" group by TABLE_NAME;
             """
+        print('_sql',_sql)
         cursor = self.session.execute(text(_sql))
         results = cursor.fetchall()
         return results
@@ -479,7 +480,7 @@ class RDBMSDatabase(BaseConnect):
                 features = self.records_to_geojson(field_names, result)
             else:
                 features = self.records_to_json(field_names,result)
-        return json.dumps(features)
+        return json.dumps(features,ensure_ascii=False)
     
     def records_to_geojson(self, keys:list[str],rows:list[tuple]):
         features = []
@@ -490,7 +491,10 @@ class RDBMSDatabase(BaseConnect):
                 if key !='geom':
                     properties[key] = value
                 else:
-                    geometry=geojson.loads(value)
+                    if(isinstance(value,str)):
+                        geometry=geojson.loads(value)
+                    else:
+                        geometry=value
             features.append({
                 "type": "Feature",
                 "properties": properties,
